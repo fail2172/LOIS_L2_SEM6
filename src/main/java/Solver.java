@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Solver {
 
@@ -12,14 +9,31 @@ public class Solver {
     private static final String CLOSE_BRACKET_STR = ")";
     private static final char OPEN_BRACKET_CH = '(';
     private static final char CLOSE_BRACKET_CH = ')';
+    private static final char TRUE = '1';
+    private static final char FALSE = '0';
+    private static final String TRUE_STR = "1";
+    private static final String IMPLICATION = "->";
+    private static final String EQUIVALENCE = "~";
+    private static final String CONJUNCTION = "/\\";
+    private static final String DISJUNCTION = "\\/";
+    private static final String EMPTY = "";
+
+    private Solver() {
+
+    }
+
+    public static Solver getInstance() {
+        return Holder.INSTANCE;
+    }
 
     public TruthTable solve(String formula) throws SyntaxException {
         validator.validate(formula);
-        final List<Character> variableList = variableList(formula);
         final TruthTable table = new TruthTable(formula);
+        int answerPosition = table.weight() - 1;
         for (int i = 0; i < table.height(); i++) {
-            boolean decision = solveExpression(replaceVariable(formula, variableList, table.getRow(i)));
-            table.setCell(i, table.weight() - 1, decision);
+            final String expression = replaceVariable(formula, variableList(formula), table.getRow(i));
+            boolean decision = solveExpression(expression);
+            table.setCell(i, answerPosition, decision);
         }
         return table;
     }
@@ -27,7 +41,7 @@ public class Solver {
     private String replaceVariable(String formula, List<Character> variableList, boolean[] values) {
         for (int i = 0; i < variableList.size(); i++) {
             char oldChar = variableList.get(i);
-            char newChar = values[i] ? '1' : '0';
+            char newChar = values[i] ? TRUE : FALSE;
             formula = formula.replace(oldChar, newChar);
         }
         return formula;
@@ -50,15 +64,15 @@ public class Solver {
     private boolean solveExpression(String formula) {
         formula = withoutBrackets(formula);
         if (signPosition(formula) == -1) {
-            return formula.startsWith(NEGATION) != formula.contains("1");
+            return formula.startsWith(NEGATION) != formula.contains(TRUE_STR);
         }
         final String leftSide = leftSide(formula);
         final String rightSide = rightSide(formula);
         return switch (getSign(formula, signPosition(formula))) {
-            case "->" -> !solveExpression(leftSide) || solveExpression(rightSide);
-            case "~" -> solveExpression(leftSide) == solveExpression(rightSide);
-            case "/\\" -> solveExpression(leftSide) && solveExpression(rightSide);
-            case "\\/" -> solveExpression(leftSide) || solveExpression(rightSide);
+            case IMPLICATION -> !solveExpression(leftSide) || solveExpression(rightSide);
+            case EQUIVALENCE -> solveExpression(leftSide) == solveExpression(rightSide);
+            case CONJUNCTION -> solveExpression(leftSide) && solveExpression(rightSide);
+            case DISJUNCTION -> solveExpression(leftSide) || solveExpression(rightSide);
             default -> false;
         };
     }
@@ -106,6 +120,10 @@ public class Solver {
                 return sign;
             }
         }
-        return "";
+        return EMPTY;
+    }
+
+    private static class Holder {
+        private static final Solver INSTANCE = new Solver();
     }
 }

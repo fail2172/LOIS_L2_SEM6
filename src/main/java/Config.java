@@ -3,7 +3,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Config {
-    public static final List<String> SIGNS = new ArrayList<>(Arrays.asList("!", "/\\", "\\/", "(", ")", "->", "~"));
     public static final List<String> BINARY_SIGN = new ArrayList<>(Arrays.asList("/\\", "\\/","->", "~"));
     public static final List<String> SYMBOLS = new ArrayList<>(
             Arrays.asList(

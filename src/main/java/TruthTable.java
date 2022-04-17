@@ -15,7 +15,7 @@ public class TruthTable {
     private final boolean[][] table;
 
     public TruthTable(String formula) {
-        variableList(formula);
+        receiveVariableList(formula);
         rows = (int) Math.pow(2, variableList.size());
         cols = variableList.size() + 1;
         table = new boolean[rows][cols];
@@ -42,7 +42,7 @@ public class TruthTable {
         }
     }
 
-    private void variableList(String formula) {
+    private void receiveVariableList(String formula) {
         for (char ch : formula.toCharArray()) {
             if (Config.SYMBOLS.contains(String.valueOf(ch))) {
                 variableList.add(ch);
@@ -62,12 +62,15 @@ public class TruthTable {
         return cols;
     }
 
-    public void setCell(int i, int j, boolean value) {
-        table[i][j] = value;
+    public boolean getCell(int i, int j) {
+        return table[i][j];
     }
-
     public boolean[] getRow(int i) {
         return table[i];
+    }
+
+    public void setCell(int i, int j, boolean value) {
+        table[i][j] = value;
     }
 
     public void printTable() {
