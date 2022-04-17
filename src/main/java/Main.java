@@ -1,9 +1,9 @@
 public class Main {
     public static void main(String[] args) {
         try {
-           Validator.getInstance().validate1("(((!A)/\\B)/\\(C\\/(!A)))");
+           Validator.getInstance().validate("!A");
         } catch (SyntaxException e) {
-            e.printStackTrace();
+            System.out.println(e);
         }
     }
 }

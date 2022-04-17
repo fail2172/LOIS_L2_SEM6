@@ -1,5 +1,12 @@
 public class Validator {
 
+    private static final String NEGATION = "!";
+    private static final String ERROR_SEPARATOR = " _ERROR_ ";
+    private static final String OPEN_BRACKET_STR = "(";
+    private static final String CLOSE_BRACKET_STR = ")";
+    private static final char OPEN_BRACKET_CH = '(';
+    private static final char CLOSE_BRACKET_CH = ')';
+
     private Validator() {
     }
 
@@ -7,51 +14,66 @@ public class Validator {
         return Holder.INSTANCE;
     }
 
-    public void validate1(String formula) throws SyntaxException {
-        try {
-            validate(formula);
-        } catch (Exception e) {
-            throw new SyntaxException("Invalid sign syntax");
-        }
-    }
-
     public void validate(String formula) throws SyntaxException {
-        if (formula.length() > 2) {
-            final String leftSide = leftSide(withoutBrackets(formula));
-            final String rightSide = rightSide(withoutBrackets(formula));
-            validate(withoutBrackets(leftSide));
-            validate(withoutBrackets(rightSide));
-        } else if (formula.startsWith("!")) {
-            validate(formula.substring(1));
-        } else if (!checkSymbol(formula)) {
-            throw new SyntaxException("Invalid expression syntax");
+        try {
+            if (formula.startsWith(NEGATION)) {
+                throw new SyntaxException("Invalid negation syntax: ", formula);
+            }
+            dfs(withoutBrackets(formula));
+        } catch (SyntaxException e) {
+            throw new SyntaxException(errorMessageConstructor(formula, e));
+        } catch (StringIndexOutOfBoundsException e) {
+            throw new SyntaxException("Invalid syntax");
         }
     }
 
-    public String leftSide(String formula) throws SyntaxException {
+    private String errorMessageConstructor(String formula, SyntaxException e) {
+        int errorPosition = formula.indexOf(e.getErrorPlace());
+        return e.getMessage()
+                + formula.substring(0, errorPosition)
+                + ERROR_SEPARATOR
+                + e.getErrorPlace()
+                + ERROR_SEPARATOR
+                + formula.substring(errorPosition + e.getErrorPlace().length());
+    }
+
+    private void dfs(String formula) throws SyntaxException {
+        if (signPosition(formula) != -1) {
+            final String leftSide = leftSide(formula);
+            final String rightSide = rightSide(formula);
+            dfs(withoutBrackets(leftSide));
+            dfs(withoutBrackets(rightSide));
+        } else if (formula.startsWith(NEGATION)) {
+            dfs(formula.substring(1));
+        } else if (!checkSymbol(formula)) {
+            throw new SyntaxException("There is no such variable in the alphabet: ", formula);
+        }
+    }
+
+    private String leftSide(String formula) throws SyntaxException {
         final int singPosition = signPosition(formula);
         final String leftSide = formula.substring(0, singPosition);
-        if (leftSide.startsWith("!")) {
-            throw new SyntaxException("Invalid sign syntax");
+        if (leftSide.startsWith(NEGATION)) {
+            throw new SyntaxException("Invalid negation syntax: ", formula);
         }
         return leftSide;
     }
 
-    public String rightSide(String formula) throws SyntaxException {
+    private String rightSide(String formula) throws SyntaxException {
         final int singPosition = signPosition(formula);
         final String sign = getSign(formula, singPosition);
         final String rightSide = sign.length() == 2
                 ? formula.substring(singPosition + 2)
                 : formula.substring(singPosition + 1);
-        if (rightSide.startsWith("!")) {
-            throw new SyntaxException("Invalid sign syntax");
+        if (rightSide.startsWith(NEGATION)) {
+            throw new SyntaxException("Invalid negation syntax: ", formula);
         }
         return rightSide;
     }
 
-    public String withoutBrackets(String formula) throws SyntaxException {
+    private String withoutBrackets(String formula) throws SyntaxException {
         while (signPosition(formula) == -1) {
-            if (formula.startsWith("(") && formula.endsWith(")")) {
+            if (formula.startsWith(OPEN_BRACKET_STR) && formula.endsWith(CLOSE_BRACKET_STR)) {
                 formula = formula.substring(1, formula.length() - 1);
             } else {
                 return formula;
@@ -63,15 +85,15 @@ public class Validator {
     private int signPosition(String formula) throws SyntaxException {
         int bracket = 0;
         for (int i = 0; i < formula.length(); i++) {
-            if (formula.charAt(i) == '(') {
+            if (formula.charAt(i) == OPEN_BRACKET_CH) {
                 bracket++;
-            } else if (formula.charAt(i) == ')') {
+            } else if (formula.charAt(i) == CLOSE_BRACKET_CH) {
                 bracket--;
             } else if (bracket == 0 && i != 0 && i != formula.length() - 1) {
                 if (checkSign(formula, i)) {
                     return i;
                 }
-                throw new SyntaxException("Invalid sign syntax");
+                throw new SyntaxException("There is no such sign in the alphabet: ", formula);
             }
         }
         return -1;
@@ -84,10 +106,10 @@ public class Validator {
                 return sign;
             }
         }
-        throw new SyntaxException("Invalid sign syntax");
+        throw new SyntaxException("There is no such sign in the alphabet: ", formula);
     }
 
-    public boolean checkSign(String formula, int signPosition) {
+    private boolean checkSign(String formula, int signPosition) {
         final String sub = formula.substring(signPosition);
         return Config.BINARY_SIGN.stream()
                 .anyMatch(sub::startsWith);
