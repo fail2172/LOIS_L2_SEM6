@@ -60,11 +60,10 @@ public class Validator {
     }
 
     private String rightSide(String formula) throws SyntaxException {
-        final int singPosition = signPosition(formula);
-        final String sign = getSign(formula, singPosition);
+        final String sign = getSign(formula, signPosition(formula));
         final String rightSide = sign.length() == 2
-                ? formula.substring(singPosition + 2)
-                : formula.substring(singPosition + 1);
+                ? formula.substring(signPosition(formula) + 2)
+                : formula.substring(signPosition(formula) + 1);
         if (rightSide.startsWith(NEGATION)) {
             throw new SyntaxException("Invalid negation syntax: ", formula);
         }
