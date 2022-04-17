@@ -1,12 +1,11 @@
 public class Main {
     public static void main(String[] args) {
+        Solver solver = new Solver();
         try {
-           Validator.getInstance().validate("(A/\\B)");
+            TruthTable table = solver.solve("((A/\\(!B))~((!A)\\/B))");
+            table.printTable();
         } catch (SyntaxException e) {
             System.out.println(e);
         }
-
-        Solver solver = new Solver();
-        System.out.println(solver.solve("((A/\\B)~C)"));
     }
 }

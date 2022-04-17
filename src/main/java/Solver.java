@@ -5,18 +5,23 @@ import java.util.Set;
 
 public class Solver {
 
+    private static final Validator validator = Validator.getInstance();
+
     private static final String NEGATION = "!";
-    private static final String ERROR_SEPARATOR = " _ERROR_ ";
     private static final String OPEN_BRACKET_STR = "(";
     private static final String CLOSE_BRACKET_STR = ")";
     private static final char OPEN_BRACKET_CH = '(';
     private static final char CLOSE_BRACKET_CH = ')';
 
-    public boolean solve(String formula) {
+    public TruthTable solve(String formula) throws SyntaxException {
+        validator.validate(formula);
         final List<Character> variableList = variableList(formula);
-        final TruthTable table = new TruthTable(variableList.size());
-        boolean[] mass = {true, true, false};
-        return solveExpression(replaceVariable(formula, variableList, mass));
+        final TruthTable table = new TruthTable(formula);
+        for (int i = 0; i < table.height(); i++) {
+            boolean decision = solveExpression(replaceVariable(formula, variableList, table.getRow(i)));
+            table.setCell(i, table.weight() - 1, decision);
+        }
+        return table;
     }
 
     private String replaceVariable(String formula, List<Character> variableList, boolean[] values) {
@@ -25,7 +30,6 @@ public class Solver {
             char newChar = values[i] ? '1' : '0';
             formula = formula.replace(oldChar, newChar);
         }
-        System.out.println(formula);
         return formula;
     }
 
@@ -39,10 +43,11 @@ public class Solver {
         Set<Character> set = new HashSet<>(variables);
         variables.clear();
         variables.addAll(set);
+        variables.sort(Character::compareTo);
         return variables;
     }
 
-    public boolean solveExpression(String formula) {
+    private boolean solveExpression(String formula) {
         formula = withoutBrackets(formula);
         if (signPosition(formula) == -1) {
             return formula.startsWith(NEGATION) != formula.contains("1");
