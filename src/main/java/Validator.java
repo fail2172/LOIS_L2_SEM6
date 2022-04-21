@@ -1,7 +1,6 @@
 public class Validator {
 
     private static final String NEGATION = "!";
-    private static final String ERROR_SEPARATOR = " _ERROR_ ";
     private static final String OPEN_BRACKET_STR = "(";
     private static final String CLOSE_BRACKET_STR = ")";
     private static final char OPEN_BRACKET_CH = '(';
@@ -20,21 +19,9 @@ public class Validator {
                 throw new SyntaxException("Invalid negation syntax: ", formula);
             }
             dfs(withoutBrackets(formula));
-        } catch (SyntaxException e) {
-            throw new SyntaxException(errorMessageConstructor(formula, e));
         } catch (StringIndexOutOfBoundsException e) {
             throw new SyntaxException("Invalid syntax");
         }
-    }
-
-    private String errorMessageConstructor(String formula, SyntaxException e) {
-        int errorPosition = formula.indexOf(e.getErrorPlace());
-        return e.getMessage()
-                + formula.substring(0, errorPosition)
-                + ERROR_SEPARATOR
-                + e.getErrorPlace()
-                + ERROR_SEPARATOR
-                + formula.substring(errorPosition + e.getErrorPlace().length());
     }
 
     private void dfs(String formula) throws SyntaxException {

@@ -20,7 +20,6 @@ public class TruthTable {
         cols = variableList.size() + 1;
         table = new boolean[rows][cols];
         fillVariableCol();
-        fillResultCol();
     }
 
     private void fillVariableCol() {
@@ -33,12 +32,6 @@ public class TruthTable {
                 }
                 table[j][i] = flag;
             }
-        }
-    }
-
-    private void fillResultCol() {
-        for (int i = 0; i < rows; i++) {
-            table[i][cols - 1] = false;
         }
     }
 
@@ -58,7 +51,7 @@ public class TruthTable {
         return rows;
     }
 
-    public int weight() {
+    public int width() {
         return cols;
     }
 

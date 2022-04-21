@@ -1,23 +1,30 @@
 public class Main {
+
     public static void main(String[] args) {
         try {
-            Solver solver = Solver.getInstance();
-            TruthTable table = solver.solve("(((!A)/\\B)~(A\\/(!B)))");
-            table.printTable();
+            SolverThreading solverThreading = SolverThreading.getInstance();
+            TruthTable table = solverThreading.solve("(((((((((((((((((((((((((A/\\B)/\\C)/\\D)/\\E)/\\F)/\\G)/\\H)/\\I)/\\J)/\\K)/\\L)/\\M)/\\N)/\\O)/\\P)/\\Q)/\\R)/\\S)/\\T)/\\U)/\\V)/\\W)/\\X)/\\Y)/\\Z)");
+            //table.printTable();
             System.out.println();
-            boolean flag = true;
+            boolean generallyValid = true;
+            boolean impossible = true;
             for (int i = 0; i < table.height(); i++) {
-                if (table.getCell(i, table.weight() - 1)){
-                    flag = false;
-                    break;
+                if (table.getCell(i, table.width() - 1)){
+                    impossible = false;
+                } else {
+                    generallyValid = false;
                 }
             }
-            if (flag) {
-                System.out.println("The function is not executable");
+            if (generallyValid){
+                System.out.println("Formula is generally valid");
+            } else if (impossible) {
+                System.out.println("Formula is impossible");
             } else {
-                System.out.println("The function is not invalid");
+                System.out.println("Formula is neutral");
             }
         } catch (SyntaxException e) {
+            System.out.println(e.getMessage() + e.getErrorPlace());
+        } catch (InterruptedException e) {
             System.out.println(e.getMessage());
         }
     }

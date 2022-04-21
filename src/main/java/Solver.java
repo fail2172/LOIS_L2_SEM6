@@ -1,8 +1,9 @@
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-public class Solver {
-
-    private static final Validator validator = Validator.getInstance();
+public record Solver(int threadNum, int threadAmount, String formula, TruthTable table) implements Runnable {
 
     private static final String NEGATION = "!";
     private static final String OPEN_BRACKET_STR = "(";
@@ -18,24 +19,16 @@ public class Solver {
     private static final String DISJUNCTION = "\\/";
     private static final String EMPTY = "";
 
-    private Solver() {
-
-    }
-
-    public static Solver getInstance() {
-        return Holder.INSTANCE;
-    }
-
-    public TruthTable solve(String formula) throws SyntaxException {
-        validator.validate(formula);
-        final TruthTable table = new TruthTable(formula);
-        int answerPosition = table.weight() - 1;
-        for (int i = 0; i < table.height(); i++) {
+    @Override
+    public void run() {
+        int answerPosition = table.width() - 1;
+        int i = threadNum;
+        while (i < table.height()) {
             final String expression = replaceVariable(formula, variableList(formula), table.getRow(i));
             boolean decision = solveExpression(expression);
             table.setCell(i, answerPosition, decision);
+            i += threadAmount;
         }
-        return table;
     }
 
     private String replaceVariable(String formula, List<Character> variableList, boolean[] values) {
@@ -121,9 +114,5 @@ public class Solver {
             }
         }
         return EMPTY;
-    }
-
-    private static class Holder {
-        private static final Solver INSTANCE = new Solver();
     }
 }
