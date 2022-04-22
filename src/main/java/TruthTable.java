@@ -14,6 +14,8 @@ public class TruthTable {
     private static final String DECISION = "Decision";
     private static final String DOUBLE_INTRACT = "\t\t";
     private static final String INTRACT = "\t";
+    private static final char ONE_CHAR = '1';
+    private static final char ZERO_NUM = '0';
 
     private final List<Character> variableList = new ArrayList<>();
     private final int rows;
@@ -40,12 +42,11 @@ public class TruthTable {
             }
         }
         for (int i = 0; i < variableList.size(); i++) {
-            System.out.println(variableList.get(i));
-            if (variableList.get(i).equals('1')) {
+            if (variableList.get(i).equals(ONE_CHAR)) {
                 for (int j = 0; j < rows; j++) {
                     table[j][i] = true;
                 }
-            } else if(variableList.get(i).equals('0')) {
+            } else if(variableList.get(i).equals(ZERO_NUM)) {
                 for (int j = 0; j < rows; j++) {
                     table[j][i] = false;
                 }

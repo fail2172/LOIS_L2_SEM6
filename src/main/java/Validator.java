@@ -21,7 +21,7 @@ public class Validator {
 
     public void validate(String formula) throws SyntaxException {
         try {
-            if (formula.startsWith(NEGATION)) {
+            if (formula.startsWith(NEGATION) || signPosition(formula) != -1) {
                 throw new SyntaxException("Invalid negation syntax: ", formula);
             }
             dfs(withoutBrackets(formula));
@@ -54,19 +54,21 @@ public class Validator {
 
     private String rightSide(String formula) throws SyntaxException {
         final String sign = getSign(formula, signPosition(formula));
-        final String rightSide = sign.length() == 2
+        return sign.length() == 2
                 ? formula.substring(signPosition(formula) + 2)
                 : formula.substring(signPosition(formula) + 1);
-        if (rightSide.startsWith(NEGATION)) {
-            throw new SyntaxException("Invalid negation syntax: ", formula);
-        }
-        return rightSide;
     }
 
     private String withoutBrackets(String formula) throws SyntaxException {
         while (signPosition(formula) == -1) {
+            if (formula.startsWith("!")) {
+                formula = formula.substring(1);
+            }
             if (formula.startsWith(OPEN_BRACKET_STR) && formula.endsWith(CLOSE_BRACKET_STR)) {
                 formula = formula.substring(1, formula.length() - 1);
+                if (formula.length() == 1) {
+                    throw new SyntaxException("Invalid syntax: ", formula);
+                }
             } else {
                 return formula;
             }
@@ -98,7 +100,7 @@ public class Validator {
                 return sign;
             }
         }
-        throw new SyntaxException("There is no such sign in the alphabet: ", formula);
+        throw new SyntaxException("+t: ", formula);
     }
 
     private boolean checkSign(String formula, int signPosition) {

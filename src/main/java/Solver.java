@@ -14,11 +14,11 @@ public record Solver(int threadNum, int threadAmount, String formula, TruthTable
     private static final String NEGATION = "!";
     private static final String OPEN_BRACKET_STR = "(";
     private static final String CLOSE_BRACKET_STR = ")";
+    private static final String ONE_STR = "1";
     private static final char OPEN_BRACKET_CH = '(';
     private static final char CLOSE_BRACKET_CH = ')';
-    private static final char TRUE = '1';
-    private static final char FALSE = '0';
-    private static final String TRUE_STR = "1";
+    private static final char ONE_CHAR = '1';
+    private static final char ZERO_CHAR = '0';
     private static final String IMPLICATION = "->";
     private static final String EQUIVALENCE = "~";
     private static final String CONJUNCTION = "/\\";
@@ -40,7 +40,7 @@ public record Solver(int threadNum, int threadAmount, String formula, TruthTable
     private String replaceVariable(String formula, List<Character> variableList, boolean[] values) {
         for (int i = 0; i < variableList.size(); i++) {
             char oldChar = variableList.get(i);
-            char newChar = values[i] ? TRUE : FALSE;
+            char newChar = values[i] ? ONE_CHAR : ZERO_CHAR;
             formula = formula.replace(oldChar, newChar);
         }
         return formula;
@@ -62,8 +62,11 @@ public record Solver(int threadNum, int threadAmount, String formula, TruthTable
 
     private boolean solveExpression(String formula) {
         formula = withoutBrackets(formula);
+        if (formula.startsWith(NEGATION)) {
+            return !solveExpression(formula.substring(1));
+        }
         if (signPosition(formula) == -1) {
-            return formula.startsWith(NEGATION) != formula.contains(TRUE_STR);
+            return formula.contains(ONE_STR);
         }
         final String leftSide = leftSide(formula);
         final String rightSide = rightSide(formula);
