@@ -1,3 +1,9 @@
+/////////////////////////////////////////////////////////////////////////////////////////
+// Лабораторная работа №1 по дисциплине ЛОИС
+// Вариант С: Проверить, является ли формула СКНФ
+// Выполнена студентом группы 921701 БГУИР Соловьёв А.М.
+// Класс предназначен для проверки формулы и для проверки знаний пользователя
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -33,6 +39,18 @@ public class TruthTable {
                 table[j][i] = flag;
             }
         }
+        for (int i = 0; i < variableList.size(); i++) {
+            System.out.println(variableList.get(i));
+            if (variableList.get(i).equals('1')) {
+                for (int j = 0; j < rows; j++) {
+                    table[j][i] = true;
+                }
+            } else if(variableList.get(i).equals('0')) {
+                for (int j = 0; j < rows; j++) {
+                    table[j][i] = false;
+                }
+            }
+        }
     }
 
     private void receiveVariableList(String formula) {
@@ -58,6 +76,7 @@ public class TruthTable {
     public boolean getCell(int i, int j) {
         return table[i][j];
     }
+
     public boolean[] getRow(int i) {
         return table[i];
     }

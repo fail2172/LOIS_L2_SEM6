@@ -1,10 +1,21 @@
+/////////////////////////////////////////////////////////////////////////////////////////
+// Лабораторная работа №1 по дисциплине ЛОИС
+// Вариант С: Проверить, является ли формула СКНФ
+// Выполнена студентом группы 921701 БГУИР Шило М.Ю
+// Класс предназначен для проверки формулы и для проверки знаний пользователя
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+
 public class Main {
 
     public static void main(String[] args) {
         try {
             SolverThreading solverThreading = SolverThreading.getInstance();
-            TruthTable table = solverThreading.solve("(((((((((((((((((((((((((A/\\B)/\\C)/\\D)/\\E)/\\F)/\\G)/\\H)/\\I)/\\J)/\\K)/\\L)/\\M)/\\N)/\\O)/\\P)/\\Q)/\\R)/\\S)/\\T)/\\U)/\\V)/\\W)/\\X)/\\Y)/\\Z)");
-            //table.printTable();
+            Scanner sc = new Scanner(new File("src/main/resources/input.txt"));
+            TruthTable table = solverThreading.solve(sc.nextLine());
+            table.printTable();
             System.out.println();
             boolean generallyValid = true;
             boolean impossible = true;
@@ -24,7 +35,7 @@ public class Main {
             }
         } catch (SyntaxException e) {
             System.out.println(e.getMessage() + e.getErrorPlace());
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | FileNotFoundException e) {
             System.out.println(e.getMessage());
         }
     }
