@@ -45,11 +45,7 @@ public class Validator {
 
     private String leftSide(String formula) throws SyntaxException {
         final int singPosition = signPosition(formula);
-        final String leftSide = formula.substring(0, singPosition);
-        if (leftSide.startsWith(NEGATION)) {
-            throw new SyntaxException("Invalid negation syntax: ", formula);
-        }
-        return leftSide;
+        return formula.substring(0, singPosition);
     }
 
     private String rightSide(String formula) throws SyntaxException {
@@ -61,13 +57,13 @@ public class Validator {
 
     private String withoutBrackets(String formula) throws SyntaxException {
         while (signPosition(formula) == -1) {
-            if (formula.startsWith("!")) {
+            if (formula.startsWith(NEGATION)) {
                 formula = formula.substring(1);
             }
             if (formula.startsWith(OPEN_BRACKET_STR) && formula.endsWith(CLOSE_BRACKET_STR)) {
                 formula = formula.substring(1, formula.length() - 1);
                 if (formula.length() == 1) {
-                    throw new SyntaxException("Invalid syntax: ", formula);
+                    throw new SyntaxException("Brackets without operations: ", formula);
                 }
             } else {
                 return formula;

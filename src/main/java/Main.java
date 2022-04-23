@@ -29,7 +29,7 @@ public class Main {
             if (generallyValid){
                 System.out.println("Formula is generally valid");
             } else if (impossible) {
-                System.out.println("Formula is impossible");
+                System.out.println("Formula is unsatisfiable");
             } else {
                 System.out.println("Formula is neutral");
             }
